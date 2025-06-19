@@ -1,32 +1,44 @@
 import asyncio
 from bot_instance import bot
 from aiogram import Bot, Dispatcher
-
 from config import BotConfig
+from database.database import drop_db, create_db, session_maker
 from handlers.admin_hand import admin_router
+
 from handlers.user_hand import user_router
-from aiogram.utils.markdown import hbold
+from message.user_message import welcome_message
 from middlewares.antispam import AntiSpam
+import os
+from dotenv import load_dotenv
+
+from middlewares.session import DataBaseSession
+
+load_dotenv()
+
+async def on_startup(bot : Bot):
+    run_par = False
+    if run_par:
+        await drop_db()
+    await create_db()
+
+async def on_shutdown(bot : Bot):
+    print('Bot умер(ненадолго )')
+
 
 def register_routers(dp: Dispatcher) -> None:
     dp.include_router(user_router)
     dp.include_router(admin_router)
 
-
 async def main(bot: Bot) -> None:
     dp = Dispatcher()
+    dp.startup.register(on_startup)
+    dp.shutdown.register(on_shutdown)
     dp.message.middleware(AntiSpam(delsec=0.5))  # можно изменить интервал
+    dp.update.middleware(DataBaseSession(session_pool=session_maker))
     dp.callback_query.middleware(AntiSpam(delsec=0.5))
     config = BotConfig(
-        admin_ids=[209963062],
-        welcome_message=(
-            f"{hbold('Добро пожаловать в ZATLAN TEA!')} 🍃\n\n"
-            f"Вы попали в место, где живут самые {hbold('вкусные и ароматные чаи')} со всего мира.\n"
-            f"Каждый сорт — это история, настроение и маленькое путешествие. 🍵\n\n"
-            f"🔸 Не знаете, какой чай выбрать? Мы с радостью подскажем! 🌿\n"
-            f"🔸 Хотите узнать секреты заваривания? В боте вас ждут советы и рецепты! ☕️\n\n"
-            f"{hbold('Готовы начать чайное путешествие?')} 🌍✨"
-        )
+        admin_ids=[int(os.getenv('ADMIN_ID'))],
+        welcome_message=welcome_message
     )
     dp['config'] = config
     register_routers(dp)

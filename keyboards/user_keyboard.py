@@ -12,3 +12,22 @@ request_phone_keyboard = types.ReplyKeyboardMarkup(
     resize_keyboard=True,
     one_time_keyboard=True
 )
+
+consent_keyboard = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [types.KeyboardButton(text="Согласен на обработку персональных данных")]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
+
+user_main_keyboard = types.ReplyKeyboardMarkup(
+    keyboard=[
+        [types.KeyboardButton(text="📋 Меню")],
+        [types.KeyboardButton(text="❓ FAQ"), types.KeyboardButton(text="📞Контакты")],
+        [types.KeyboardButton(text="🎁 Мои бонусы"), types.KeyboardButton(text="🛒 Мои заказы")],
+        [types.KeyboardButton(text="⚙️ Профиль")]
+    ],
+    resize_keyboard=True,
+    one_time_keyboard=False
+)

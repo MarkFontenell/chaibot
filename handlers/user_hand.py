@@ -4,16 +4,29 @@ from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold, hitalic
+from sqlalchemy import select
+
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.models import Users, Product
+from message.user_message import welcome_messages, long_name_responses, returning_welcome_messages
 from states.user_fsm import Registration
-from keyboards.user_keyboard import start_button, request_phone_keyboard
+from keyboards.user_keyboard import start_button, request_phone_keyboard, consent_keyboard, user_main_keyboard
 from config import BotConfig
 
 user_router = Router()
 
 @user_router.message(CommandStart())
-async def cmd_start(msg: Message, config: BotConfig) -> None:
+async def cmd_start(msg: Message, config: BotConfig, session: AsyncSession) -> None:
     if msg.from_user.id not in config.admin_ids:
-        await msg.answer(config.welcome_message, reply_markup=start_button)
+
+        result = await session.execute(select(Users).where(Users.tg_id == msg.from_user.id))
+        user = result.scalars().first()
+        if user:
+            text = choice(returning_welcome_messages).format(name=user.nick)
+            await msg.answer(text, reply_markup=user_main_keyboard)
+        else:
+            await msg.answer(config.welcome_message, reply_markup=start_button)
     else:
         await msg.answer(f"{hbold('Добро пожаловать, администратор!')} 👑\n\n"
                          "Вы вошли в панель управления ботом ZATLAN TEA 🍃.\n\n"
@@ -32,58 +45,71 @@ async def cmd_start(msg: Message, config: BotConfig) -> None:
 
 
 @user_router.callback_query(F.data == "start_journey")
-async def start_registration(callback: types.CallbackQuery, state: FSMContext):
-    await callback.message.answer(
-        "🌿 Прежде чем отправиться в наше чайное путешествие, давай познакомимся!🌸\n\n"
-        "Как тебя зовут? 😊"
-    )
+async def start_registration(callback: types.CallbackQuery, state: FSMContext) :
+    await callback.message.delete()
+
+    await callback.message.answer(choice(welcome_messages))
     await state.set_state(Registration.name)
     await callback.answer()
 
 # Принимаем имя и спрашиваем номер
 @user_router.message(Registration.name)
-async def get_name(message: types.Message, state: FSMContext):
-    name = message.text.strip()
-
-    long_name_responses = ([
-        "Ого, какое длинное имя! 😅\nМы, конечно, любим интересные истории, но попробуй назвать себя чуть короче — не роман в трёх томах, а просто имя 🍵✨",
-        "Имя получилось длиннее чайного свитка! 📜😄\nДавай немного сократим, чтобы нам всем было проще запомнить 🍵",
-        "Ого, такое имя и в чайник не уместить! 😅\nПопробуй что-нибудь покороче, как любимая заварка 🌱",
-        "Такое длинное имя — достойно легенды! 📖✨\nНо нам бы для регистрации что-нибудь покороче, ладно? 😊",
-        "Имя впечатляет... но Telegram может обидеться 😅\nДавай попробуем в 30 символов уложиться, как в уютную чашку чая ☕",
-        "Вау, такое имя можно использовать как пароль от сейфа! 🔐😄\nНо для регистрации лучше что-то покороче.",
-        "Такое имя — целая поэма, но нам хватит и строчки! 📜😉\nПопробуй назвать себя покороче.",
-        "Кажется, твое имя занимает больше места, чем чашка с чаем на столе! ☕📏\nДавай чуть короче, пожалуйста.",
-        "Имя впечатляет своей длиной, но для чая нужна лёгкость! 🍃😌\nПостарайся уместиться в 30 символов.",
-        "Ого, имя словно свиток древних знаний! 📜✨\nНо для бота сделаем его чуть короче, окей?",
-        "Такое длинное имя точно запомнят, но Telegram может сбиться с ритма! 🤖😅\nДавай попробуем проще.",
-        "Имя длиной с чайную церемонию, но нам хватит 30 символов. 🍵⌛\nСократи, чтобы продолжить.",
-        "Это имя как густой настой — насыщенно, но немного тяжеловато! ☕😉\nДавай чуть легче, пожалуйста."
-    ])
-
+async def get_name(msg: types.Message, state: FSMContext):
+    name = msg.text.strip()
 
     if len(name) > 30:
-        await message.answer(choice(long_name_responses))
-        return  # Не продолжаем регистрацию
+        await msg.answer(choice(long_name_responses))
+        return
 
     await state.update_data(name=name)
-    await message.answer(
+    # Запрашиваем согласие
+    await msg.answer(
         f"Отлично, {name}! 🍃\n"
-        "Теперь, пожалуйста, отправь свой номер телефона, нажав кнопку ниже 📲",
+        "Перед тем как продолжить, пожалуйста, согласись на обработку персональных данных.",
+        reply_markup=consent_keyboard
+    )
+    await state.set_state(Registration.consent_given)
+
+
+# Принимаем согласие
+@user_router.message(Registration.consent_given)
+async def get_consent(msg: types.Message, state: FSMContext):
+    if msg.text != "Согласен на обработку персональных данных":
+        await msg.answer("Для продолжения регистрации нужно согласиться на обработку персональных данных.")
+        return
+    await state.update_data(consent_given=True)
+
+    # После согласия запрашиваем номер телефона
+    await msg.answer(
+        "Спасибо! Теперь, пожалуйста, отправь свой номер телефона, нажав кнопку ниже 📲",
         reply_markup=request_phone_keyboard
     )
     await state.set_state(Registration.number)
 
-# Принимаем номер и завершаем регистрацию
+
+# Принимаем номер телефона и завершаем регистрацию (как у тебя)
 @user_router.message(Registration.number, F.contact)
-async def get_contact(message: types.Message, state: FSMContext):
-    data = await state.get_data()  # Получаем всё, что было сохранено
-    name = data.get("name")  # Достаём имя
-    phone = message.contact.phone_number  # Номер можно использовать по желанию
+async def get_contact(msg: types.Message, state: FSMContext, session : AsyncSession):
+    data = await state.get_data()
+    name = data.get("name")
+    tg_id = msg.from_user.id
+    phone = msg.contact.phone_number
+    print(phone)
+    consent = data.get("consent_given", False)
 
-    # Сюда можно вставить сохранение в базу данных
+    obj = Users(
+        nick = name,
+        tg_id = tg_id,
+        phone_number = phone,
+        consent_given = consent,)
 
-    await message.answer(
+    session.add(obj)
+    await session.commit()
+
+
+    # Здесь сохраняем в базу: name, tg_id, phone и consent
+
+    await msg.answer(
         f"Регистрация завершена! 🎉\n\n"
         f"{hbold(f'Добро пожаловать в клуб ZATLAN TEA, {name}!')} 🍵\n"
         "Теперь тебе доступны бонусы, реферальная система и уникальные предложения.\n"
@@ -91,3 +117,86 @@ async def get_contact(message: types.Message, state: FSMContext):
         reply_markup=types.ReplyKeyboardRemove()
     )
     await state.clear()
+
+@user_router.message(F.text == '❓ FAQ')
+async def FAQ(msg: Message):
+    await msg.answer(
+        "🍵 *Часто задаваемые вопросы о нашем чайном магазине:*\n\n"
+        "🔹 *Что делает этот бот?*\n"
+        "Бот помогает вам получать карту покупателя, следить за бонусами и участвовать в акциях нашего чайного магазина.\n\n"
+        "🔹 *Как получить карту покупателя?*\n"
+        "Нажмите «Регистрация» и отправьте свой номер телефона. После этого вы получите QR-код — это и есть ваша карта.\n\n"
+        "🔹 *Как пользоваться картой?*\n"
+        "Покажите QR-код продавцу при покупке. Он отсканирует его, и вам начислятся бонусы.\n\n"
+        "🔹 *Как списать бонусы?*\n"
+        "Скажите продавцу, что хотите оплатить бонусами — он отсканирует вашу карту и спишет нужную сумму.\n\n"
+        "🔹 *Что делать, если потерял QR-код?*\n"
+        "Просто снова авторизуйтесь по номеру телефона — бот пришлёт вам вашу карту заново.\n\n"
+        "Если остались вопросы — пишите нам в поддержку! ☕",
+        parse_mode="Markdown"
+    )
+
+@user_router.message(F.text == '📞Контакты')
+async def contacts(msg: Message):
+    await msg.answer(
+        "📞 *Контакты нашего чайного магазина:*\n\n"
+        "🏬 *Адрес магазина:*\n"
+        "г. Челябинск, ул. Пушкина, 1\n\n"
+        "📱 *Телефон:*\n"
+        "+7 (999) 999-99-99\n\n"
+        "💬 *Telegram для связи:*\n"
+        "[@Pisya_popa09]\n\n"
+        "🕒 *Часы работы:*\n"
+        "Пн–Сб: 10:00–20:00\n"
+        "Вс: выходной\n\n"
+        "Если у вас есть вопросы — мы всегда на связи! ☕",
+        parse_mode="Markdown"
+    )
+
+@user_router.message(F.text == '⚙️ Профиль')
+async def profile(msg: Message, session: AsyncSession):
+    result = await session.execute(
+        select(Users).where(Users.tg_id == msg.from_user.id)
+    )
+    user = result.scalar_one_or_none()
+
+    if user:
+        await msg.answer(
+            text=(
+                "🧾 <b>Профиль пользователя</b>\n"
+                "━━━━━━━━━━━━━━━━━━━━\n"
+                f"👤 <b>Ник:</b> <code>{user.nick}</code>\n"
+                f"📱 <b>Телефон:</b> <code>{user.phone_number}</code>\n"
+                f"🗓 <b>Регистрация:</b> <code>{user.created.strftime('%d.%m.%Y %H:%M')}</code>\n"
+                "━━━━━━━━━━━━━━━━━━━━"
+            ),
+            parse_mode='HTML'
+        )
+    else:
+        await msg.answer("❌ Пользователь не найден. Вы зарегистрированы?")
+
+@user_router.message(F.text == '📋 Меню')
+async def show_menu(msg: Message, session: AsyncSession):
+    products = await session.execute(select(Product))
+    products = products.scalars().all()
+
+    if not products:
+        await msg.answer("😔 Сейчас в магазине нет товаров.")
+        return
+
+    chunks = []
+    text = ""
+    for i, product in enumerate(products, 1):
+        text += (
+            f"<b>{i}. {product.name}</b>\n"
+            f"💰 <b>Цена:</b> {int(product.price)} ₽\n"
+            f"📦 <b>В наличии:</b> {product.count} шт.\n"
+            f"🆔 <b>ID:</b> {product.id}\n\n"
+        )
+        if len(text) > 3500:
+            chunks.append(text)
+            text = ""
+    chunks.append(text)
+
+    for part in chunks:
+        await msg.answer(part, parse_mode="HTML")
