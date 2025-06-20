@@ -39,7 +39,6 @@ async def cmd_start(msg: Message, config: BotConfig, session: AsyncSession) -> N
                          "/orders - посмотреть все заказы\n"
                          "/inventory - обновить ассортимент\n"
                          "/stats - получить статистику бота\n\n"
-                         "Если вам нужна помощь, напишите /help.\n\n"
                          "✨ Спасибо за управление ZATLAN TEA! 🍵"
                          )
 
@@ -187,11 +186,13 @@ async def show_menu(msg: Message, session: AsyncSession):
     chunks = []
     text = ""
     for i, product in enumerate(products, 1):
+        description = product.description or "—"
         text += (
             f"<b>{i}. {product.name}</b>\n"
             f"💰 <b>Цена:</b> {int(product.price)} ₽\n"
             f"📦 <b>В наличии:</b> {product.count} шт.\n"
-            f"🆔 <b>ID:</b> {product.id}\n\n"
+            f"🆔 <b>ID:</b> {product.id}\n"
+            f"📝 <b>Описание:</b> {description}\n\n"
         )
         if len(text) > 3500:
             chunks.append(text)
