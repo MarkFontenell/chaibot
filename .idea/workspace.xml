@@ -5,24 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5beb070a-46d6-4028-bed5-145c1d223f13" name="Changes" comment="ujk">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/admins_ids.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/database/models.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/message/user_message.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/middlewares/session.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/states/admin_fsm.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/product_pages.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/database/database.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/database.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chaibot.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/database/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/admin_hand.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_hand.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/user_hand.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/user_hand.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keyboards/user_keyboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/user_keyboard.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/middlewares/antispam.py" beforeDir="false" afterPath="$PROJECT_DIR$/middlewares/antispam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/states/user_fsm.py" beforeDir="false" afterPath="$PROJECT_DIR$/states/user_fsm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/token_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/token_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/states/admin_fsm.py" beforeDir="false" afterPath="$PROJECT_DIR$/states/admin_fsm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/product_pages.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/product_pages.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -186,7 +175,23 @@
       <option name="project" value="LOCAL" />
       <updated>1750001149308</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="ujk">
+      <option name="closed" value="true" />
+      <created>1750438560925</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1750438560925</updated>
+    </task>
+    <task id="LOCAL-00003" summary="ujk">
+      <option name="closed" value="true" />
+      <created>1750438564583</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1750438564583</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">

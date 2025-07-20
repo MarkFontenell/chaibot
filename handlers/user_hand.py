@@ -2,7 +2,7 @@ from random import choice, random
 from aiogram import Dispatcher, Bot, types, Router, F
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.utils.markdown import hbold, hitalic
 from sqlalchemy import select
 
@@ -13,6 +13,7 @@ from message.user_message import welcome_messages, long_name_responses, returnin
 from states.user_fsm import Registration
 from keyboards.user_keyboard import start_button, request_phone_keyboard, consent_keyboard, user_main_keyboard
 from config import BotConfig
+from utils.product_pages import send_products_page
 
 user_router = Router()
 
@@ -164,7 +165,7 @@ async def profile(msg: Message, session: AsyncSession):
             text=(
                 "🧾 <b>Профиль пользователя</b>\n"
                 "━━━━━━━━━━━━━━━━━━━━\n"
-                f"👤 <b>Ник:</b> <code>{user.nick}</code>\n"
+                f"👤 <b>Имя:</b> <code>{user.nick}</code>\n"
                 f"📱 <b>Телефон:</b> <code>{user.phone_number}</code>\n"
                 f"🗓 <b>Регистрация:</b> <code>{user.created.strftime('%d.%m.%Y %H:%M')}</code>\n"
                 "━━━━━━━━━━━━━━━━━━━━"
@@ -176,28 +177,9 @@ async def profile(msg: Message, session: AsyncSession):
 
 @user_router.message(F.text == '📋 Меню')
 async def show_menu(msg: Message, session: AsyncSession):
-    products = await session.execute(select(Product))
-    products = products.scalars().all()
+    await send_products_page(msg, session, page=1)
 
-    if not products:
-        await msg.answer("😔 Сейчас в магазине нет товаров.")
-        return
-
-    chunks = []
-    text = ""
-    for i, product in enumerate(products, 1):
-        description = product.description or "—"
-        text += (
-            f"<b>{i}. {product.name}</b>\n"
-            f"💰 <b>Цена:</b> {int(product.price)} ₽\n"
-            f"📦 <b>В наличии:</b> {product.count} шт.\n"
-            f"🆔 <b>ID:</b> {product.id}\n"
-            f"📝 <b>Описание:</b> {description}\n\n"
-        )
-        if len(text) > 3500:
-            chunks.append(text)
-            text = ""
-    chunks.append(text)
-
-    for part in chunks:
-        await msg.answer(part, parse_mode="HTML")
+@user_router.callback_query(F.data.startswith("page:"))
+async def paginate_products(callback: CallbackQuery, session: AsyncSession):
+    page = int(callback.data.split(":")[1])
+    await send_products_page(callback, session, page)

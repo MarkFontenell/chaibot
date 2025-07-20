@@ -1,46 +1,45 @@
-from aiogram.types import Message, CallbackQuery
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from database.models import Product
 
-PRODUCTS_PER_PAGE = 5
+PRODUCTS_PER_PAGE = 1  # Один товар на страницу
 
-async def send_products_page(msg_or_cb: Message | CallbackQuery, session: AsyncSession, page: int):
-    result = await session.execute(select(Product).order_by(Product.created.desc()))
-    products = result.scalars().all()
+async def send_products_page(target, session: AsyncSession, page: int):
+    products = await session.execute(select(Product))
+    products = products.scalars().all()
 
-    total = len(products)
-    if total == 0:
-        await msg_or_cb.answer("❌ Товары не найдены.")
+    if not products:
+        await target.answer("😔 Сейчас в магазине нет товаров.")
         return
 
+    total_pages = (len(products) - 1) // PRODUCTS_PER_PAGE + 1
     start = (page - 1) * PRODUCTS_PER_PAGE
-    end = start + PRODUCTS_PER_PAGE
-    current_products = products[start:end]
+    product = products[start]
 
-    text = ""
-    for product in current_products:
-        text += (
-            f"🛒 <b>{product.name}</b>\n"
-            f"🆔 <i>ID:</i> <code>{product.id}</code>\n"
-            f"💵 <i>Цена:</i> {int(product.price)} ₽\n"
-            f"📦 <i>В наличии:</i> {product.count} шт.\n"
-            f"🖼 <i>Изображение:</i> {product.image or '—'}\n"
-            f"{'—' * 30}\n\n"
-        )
+    text = (
+        f"<b>{product.name}</b>\n"
+        f"💰 <b>Цена:</b> {int(product.price)} ₽\n"
+        f"📦 <b>В наличии:</b> {product.count} шт.\n"
+        f"🆔 <b>ID:</b> {product.id}\n"
+        f"📝 <b>Описание:</b> {product.description or '—'}"
+    )
 
-    # Кнопки пагинации
-    kb = InlineKeyboardBuilder()
+    keyboard = InlineKeyboardBuilder()
     if page > 1:
-        kb.button(text="⬅ Назад", callback_data=f"page:{page - 1}")
-    if end < total:
-        kb.button(text="➡ Вперёд", callback_data=f"page:{page + 1}")
-    kb.adjust(2)
+        keyboard.button(text="⬅ Назад", callback_data=f"page:{page-1}")
+    if page < total_pages:
+        keyboard.button(text="➡ Далее", callback_data=f"page:{page+1}")
+    keyboard.adjust(2)
 
-    if isinstance(msg_or_cb, Message):
-        await msg_or_cb.answer(text.strip(), reply_markup=kb.as_markup())
-    else:
-        await msg_or_cb.message.edit_text(text.strip(), reply_markup=kb.as_markup())
-        await msg_or_cb.answer()
+    # Отправляем фото с подписью
+    if isinstance(target, Message):
+        await target.answer_photo(photo=product.image, caption=text, parse_mode="HTML", reply_markup=keyboard.as_markup())
+    elif isinstance(target, CallbackQuery):
+        await target.message.edit_media(
+            media=InputMediaPhoto(media=product.image, caption=text, parse_mode="HTML"),
+            reply_markup=keyboard.as_markup()
+        )
+        await target.answer()
