@@ -5,12 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5beb070a-46d6-4028-bed5-145c1d223f13" name="Changes" comment="ujk">
+      <change afterPath="$PROJECT_DIR$/utils/admin_pages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/chaibot.db" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/admins_ids.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/database/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/admin_hand.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_hand.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/user_hand.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/user_hand.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/states/admin_fsm.py" beforeDir="false" afterPath="$PROJECT_DIR$/states/admin_fsm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/keyboards/user_keyboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/user_keyboard.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/product_pages.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/product_pages.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -40,9 +42,11 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;Python.admin_pages.executor&quot;: &quot;Run&quot;,
     &quot;Python.bot.executor&quot;: &quot;Run&quot;,
     &quot;Python.client_hand.executor&quot;: &quot;Run&quot;,
     &quot;Python.middleware.executor&quot;: &quot;Run&quot;,
+    &quot;Python.models.executor&quot;: &quot;Run&quot;,
     &quot;Python.user_hand.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
@@ -55,7 +59,7 @@
     </key>
   </component>
   <component name="RunManager" selected="Python.bot">
-    <configuration name="antispam" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="admin_pages" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ChaiBot" />
       <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -64,11 +68,11 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/utils" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="C:\Users\hisma\PycharmProjects\ChaiBot\middlewares\antispam.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/utils/admin_pages.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -121,6 +125,28 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="models" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="ChaiBot" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/database" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/database/models.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="user_hand" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="ChaiBot" />
       <option name="ENV_FILES" value="" />
@@ -146,9 +172,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.bot" />
+        <item itemvalue="Python.models" />
+        <item itemvalue="Python.admin_pages" />
         <item itemvalue="Python.user_hand" />
         <item itemvalue="Python.client_hand" />
-        <item itemvalue="Python.antispam" />
       </list>
     </recent_temporary>
   </component>

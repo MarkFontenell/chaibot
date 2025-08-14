@@ -1,11 +1,11 @@
-from aiogram.types import Message, CallbackQuery, InputMediaPhoto
+from aiogram.types import Message, CallbackQuery, InputMediaPhoto, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from database.models import Product
 
-PRODUCTS_PER_PAGE = 1  # Один товар на страницу
+PRODUCTS_PER_PAGE = 1
 
 async def send_products_page(target, session: AsyncSession, page: int):
     products = await session.execute(select(Product))
@@ -32,9 +32,9 @@ async def send_products_page(target, session: AsyncSession, page: int):
         keyboard.button(text="⬅ Назад", callback_data=f"page:{page-1}")
     if page < total_pages:
         keyboard.button(text="➡ Далее", callback_data=f"page:{page+1}")
+    keyboard.row(InlineKeyboardButton(text="🛒 В корзину", callback_data=f"add_to_cart:{product.id}"))
     keyboard.adjust(2)
 
-    # Отправляем фото с подписью
     if isinstance(target, Message):
         await target.answer_photo(photo=product.image, caption=text, parse_mode="HTML", reply_markup=keyboard.as_markup())
     elif isinstance(target, CallbackQuery):

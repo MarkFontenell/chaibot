@@ -25,7 +25,7 @@ user_main_keyboard = types.ReplyKeyboardMarkup(
     keyboard=[
         [types.KeyboardButton(text="📋 Меню")],
         [types.KeyboardButton(text="❓ FAQ"), types.KeyboardButton(text="📞Контакты")],
-        [types.KeyboardButton(text="🎁 Мои бонусы"), types.KeyboardButton(text="🛒 Мои заказы")],
+        [types.KeyboardButton(text="🎁 Мои бонусы"), types.KeyboardButton(text="🛒 Корзина")],
         [types.KeyboardButton(text="⚙️ Профиль")]
     ],
     resize_keyboard=True,
