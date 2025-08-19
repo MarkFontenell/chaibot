@@ -38,7 +38,10 @@ class Product(Base):
     price: Mapped[float] = mapped_column(Float(asdecimal=True), nullable=False)
     count: Mapped[int] = mapped_column(default=0)
     image: Mapped[str] = mapped_column(default='')
-    created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
+    created: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(ekb_tz)
+    )
     updated: Mapped[DateTime] = mapped_column(DateTime, default=func.now(), onupdate=func.now())
     category_id: Mapped[int] = mapped_column(ForeignKey('category.id', ondelete='CASCADE'), nullable=False)
     category: Mapped['Category'] = relationship(backref='product')
@@ -70,7 +73,10 @@ class Order(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    created: Mapped[DateTime] = mapped_column(DateTime, default=func.now())
+    created: Mapped[DateTime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(ekb_tz)
+    )
     total_amount: Mapped[int]
     payment_method: Mapped[str] = mapped_column(String)
     is_paid: Mapped[bool] = mapped_column(default=False)

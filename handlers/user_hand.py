@@ -12,6 +12,7 @@ from sqlalchemy import select, delete
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, relationship
+from sqlalchemy.orm.sync import update
 
 from bot_instance import bot
 from database.models import Users, Product, Cart, Order, OrderItem
@@ -36,7 +37,7 @@ async def cmd_start(msg: Message, config: BotConfig, session: AsyncSession) -> N
             await msg.answer(config.welcome_message, reply_markup=start_button)
     else:
         await msg.answer(f"{hbold('Добро пожаловать, администратор!')} 👑\n\n"
-                         "Вы вошли в панель управления ботом ZATLAN TEA 🍃.\n\n"
+                         "Вы вошли в панель управления ботом Территории кофе и чая 🍃.\n\n"
                          "Вот что доступно вам:\n"
                          "🔹 Управление заказами\n"
                          "🔹 Обновление ассортимента чая\n"
@@ -46,7 +47,7 @@ async def cmd_start(msg: Message, config: BotConfig, session: AsyncSession) -> N
                          "/orders - посмотреть все заказы\n"
                          "/inventory - обновить ассортимент\n"
                          "/stats - получить статистику бота\n\n"
-                         "✨ Спасибо за управление ZATLAN TEA! 🍵", reply_markup=user_main_keyboard
+                         "✨ Спасибо за управление Территории кофе и чая! 🍵", reply_markup=user_main_keyboard
                          )
 
 
@@ -117,7 +118,7 @@ async def get_contact(msg: types.Message, state: FSMContext, session : AsyncSess
 
     await msg.answer(
         f"Регистрация завершена! 🎉\n\n"
-        f"{hbold(f'Добро пожаловать в клуб ZATLAN TEA, {name}!')} 🍵\n"
+        f"{hbold(f'Добро пожаловать в Территорию чая и кофе, {name}!')} 🍵\n"
         "Теперь тебе доступны бонусы, реферальная система и уникальные предложения.\n",
         reply_markup=types.ReplyKeyboardRemove()
     )
@@ -128,17 +129,7 @@ async def get_contact(msg: types.Message, state: FSMContext, session : AsyncSess
 async def FAQ(msg: Message):
     await msg.answer(
         "🍵 *Часто задаваемые вопросы о нашем чайном магазине:*\n\n"
-        "🔹 *Что делает этот бот?*\n"
-        "Бот помогает вам получать карту покупателя, следить за бонусами и участвовать в акциях нашего чайного магазина.\n\n"
-        "🔹 *Как получить карту покупателя?*\n"
-        "Нажмите «Регистрация» и отправьте свой номер телефона. После этого вы получите QR-код — это и есть ваша карта.\n\n"
-        "🔹 *Как пользоваться картой?*\n"
-        "Покажите QR-код продавцу при покупке. Он отсканирует его, и вам начислятся бонусы.\n\n"
-        "🔹 *Как списать бонусы?*\n"
-        "Скажите продавцу, что хотите оплатить бонусами — он отсканирует вашу карту и спишет нужную сумму.\n\n"
-        "🔹 *Что делать, если потерял QR-код?*\n"
-        "Просто снова авторизуйтесь по номеру телефона — бот пришлёт вам вашу карту заново.\n\n"
-        "Если остались вопросы — пишите нам в поддержку! ☕",
+        "🔹 *Что делает этот бот?*\n",
         parse_mode="Markdown"
     )
 
@@ -147,13 +138,13 @@ async def contacts(msg: Message):
     await msg.answer(
         "📞 *Контакты нашего чайного магазина:*\n\n"
         "🏬 *Адрес магазина:*\n"
-        "г. Челябинск, ул. Пушкина, 1\n\n"
+        "ТРК Фиеста\nг. Челябинск, ул. Молодогвардейцев, д. 7. (Возле эскалатора)\n\n"
         "📱 *Телефон:*\n"
-        "+7 (999) 999-99-99\n\n"
+        "+7 (912) 803-16-64\n\n"
         "💬 *Telegram для связи:*\n"
-        "[@Pisya_popa09]\n\n"
+        "[@avatana84]\n\n"
         "🕒 *Часы работы:*\n"
-        "Пн–Сб: 10:00–20:00\n"
+        "Пн–Вс: 10:00–22:00\n"
         "Вс: выходной\n\n"
         "Если у вас есть вопросы — мы всегда на связи! ☕",
         parse_mode="Markdown"
@@ -204,13 +195,32 @@ async def add_to_cart(callback: CallbackQuery, session: AsyncSession):
     product_id = int(callback.data.split(":")[1])
     user_tg_id = callback.from_user.id
 
+    # Получаем товар
+    product = await session.scalar(select(Product).where(Product.id == product_id))
+    if not product:
+        await callback.answer("❌ Товар не найден!", show_alert=True)
+        return
+
+    # Проверка наличия
+    if product.count == 0:
+        await callback.answer("❌ Этого товара нет в наличии!", show_alert=True)
+        return
+
     # Проверяем, есть ли уже этот товар в корзине
-    result = await session.execute(
-        select(Cart).where(Cart.user_id == user_tg_id, Cart.product_id == product_id)
+    cart_item = await session.scalar(
+        select(Cart).where(
+            Cart.user_id == user_tg_id,
+            Cart.product_id == product_id
+        )
     )
-    cart_item = result.scalar_one_or_none()
 
     if cart_item:
+        if cart_item.quantity >= product.count:
+            await callback.answer(
+                f"⚠️ Нельзя добавить больше {product.count} шт.",
+                show_alert=True
+            )
+            return
         cart_item.quantity += 1
     else:
         session.add(Cart(user_id=user_tg_id, product_id=product_id, quantity=1))
@@ -413,6 +423,8 @@ async def process_order(bot: Bot,
         user.bonus_balance = (user.bonus_balance or 0) - int(bonus_used)
         if user.bonus_balance < 0:
             user.bonus_balance = 0
+
+    # Убираем кол во товаров из ассортимента
 
     await session.commit()
 

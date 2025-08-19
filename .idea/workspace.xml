@@ -5,15 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="5beb070a-46d6-4028-bed5-145c1d223f13" name="Changes" comment="ujk">
-      <change afterPath="$PROJECT_DIR$/utils/admin_pages.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/ChaiBot.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ChaiBot.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/admins_ids.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/bot.py" beforeDir="false" afterPath="$PROJECT_DIR$/bot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chaibot.db" beforeDir="false" afterPath="$PROJECT_DIR$/chaibot.db" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/database/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/database/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/admin_hand.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/admin_hand.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/handlers/user_hand.py" beforeDir="false" afterPath="$PROJECT_DIR$/handlers/user_hand.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/keyboards/user_keyboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/keyboards/user_keyboard.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/product_pages.py" beforeDir="false" afterPath="$PROJECT_DIR$/utils/product_pages.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/states/admin_fsm.py" beforeDir="false" afterPath="$PROJECT_DIR$/states/admin_fsm.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,7 +50,9 @@
     &quot;Python.user_hand.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/www22/chaibot&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -169,6 +171,13 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.admin_pages" />
+      <item itemvalue="Python.bot" />
+      <item itemvalue="Python.client_hand" />
+      <item itemvalue="Python.models" />
+      <item itemvalue="Python.user_hand" />
+    </list>
     <recent_temporary>
       <list>
         <item itemvalue="Python.bot" />
@@ -182,10 +191,11 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-348a24fa61fa-5312c7369657-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.23774.444" />
+        <option value="bundled-python-sdk-abccbe9d933a-ba05f1cad1b1-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.20224.428" />
       </set>
     </attachedChunks>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="5beb070a-46d6-4028-bed5-145c1d223f13" name="Changes" comment="" />

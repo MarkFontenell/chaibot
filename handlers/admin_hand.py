@@ -74,6 +74,20 @@ async def add_product_description(msg: Message, state: FSMContext,config: BotCon
     if msg.from_user.id not in config.admin_ids:
         return
     await state.update_data(description=msg.text)
+    await msg.answer("📦  Введите кол-во товара на складе:")
+    await state.set_state(NewProduct.product_count)
+
+@admin_router.message(NewProduct.product_count)
+async def add_product_price(msg: Message, state: FSMContext,config: BotConfig):
+    if msg.from_user.id not in config.admin_ids:
+        return
+    try:
+        count = abs(float(msg.text))
+    except ValueError:
+        await msg.answer("❗ Введите корректное число.")
+        return
+
+    await state.update_data(count=count)
     await msg.answer("💰 Введите цену товара:")
     await state.set_state(NewProduct.product_price)
 
@@ -82,7 +96,7 @@ async def add_product_price(msg: Message, state: FSMContext, session: AsyncSessi
     if msg.from_user.id not in config.admin_ids:
         return
     try:
-        price = float(msg.text)
+        price = abs(float(msg.text))
     except ValueError:
         await msg.answer("❗ Введите корректную цену.")
         return
@@ -107,6 +121,7 @@ async def add_product_price(msg: Message, state: FSMContext, session: AsyncSessi
     await msg.answer("📂 Выберите категорию товара:", reply_markup=kb.as_markup())
     await state.set_state(NewProduct.product_category)
 
+
 @admin_router.callback_query(NewProduct.product_category, F.data.startswith("category:"))
 async def process_category_choice(callback: CallbackQuery, state: FSMContext,config: BotConfig):
     if callback.from_user.id not in config.admin_ids:
@@ -130,7 +145,7 @@ async def add_product_image(msg: Message, state: FSMContext, session: AsyncSessi
         name=data["name"],
         description=data["description"],
         price=data["price"],
-        count=0,
+        count=data["count"],
         image=photo,
         category_id=data["category_id"],
     )
@@ -274,7 +289,7 @@ async def view_order(callback: CallbackQuery, session: AsyncSession):
 
     await session.refresh(order, ["items", "user"])
     text = f"<b>📦 Заказ #{order.id}</b>\n"
-    text += f"👤 Покупатель: {order.user.nick}\n"
+    text += f"👤 Покупатель: {order.user.nick}, {order.user.phone_number}\n"
     text += f"💰 Сумма: {order.total_amount} ₽\n"
     text += f"💳 Оплата: {order.payment_method}\n"
     text += f"📅 Дата: {order.created.strftime('%d.%m.%Y %H:%M')}\n"

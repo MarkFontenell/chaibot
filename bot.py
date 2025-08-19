@@ -37,7 +37,7 @@ async def main(bot: Bot) -> None:
     dp.update.middleware(DataBaseSession(session_pool=session_maker))
     dp.callback_query.middleware(AntiSpam(delsec=0.5))
     config = BotConfig(
-        admin_ids=[int(os.getenv('ADMIN_ID'))],
+        admin_ids=[int(os.getenv('ADMIN_ID')),1671350593],
         welcome_message=welcome_message
     )
     dp['config'] = config

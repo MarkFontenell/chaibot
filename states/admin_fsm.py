@@ -4,6 +4,7 @@ class NewProduct(StatesGroup):
     """FSM для добавления товара"""
     product_name = State()
     product_description = State()
+    product_count = State()
     product_price = State()
     product_category = State()
     product_image = State()
